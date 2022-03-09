@@ -1,0 +1,42 @@
+{
+  "name": "connexio",
+  "version": "0.1.0",
+  "description": "Browser-based library for rendering and interacting with graphs",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "browser": "dist/umd/connexio.umd.js",
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "scripts": {
+    "dev": "rollup -c -w",
+    "build": "rimraf ./dist && rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "canvas",
+    "edge",
+    "graph",
+    "link",
+    "network",
+    "node",
+    "vertex",
+    "webgl"
+  ],
+  "author": "Felipe dos Reis Correia",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.2",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "eslint": "^8.10.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.70.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-ts": "^2.0.5",
+    "ts-node": "^10.7.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.2"
+  }
+}
