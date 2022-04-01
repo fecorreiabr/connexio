@@ -1,24 +1,24 @@
 import { Container, Graphics, InteractionEvent, Sprite, Text, Texture } from "@/plugins/pixijs";
-import { Graph, Node, NodeId, Layout, Vector } from "@/plugins/ngraph";
+import { Graph, Node, NodeId, Layout, Vector, Link, NodeData, LinkData } from "@/plugins/ngraph";
 import { GraphConfig } from "@/options";
 
 export class PixiNode extends Container {
     graphPosition: Vector;
+    id: NodeId;
     label?: string;
-    nodeId: NodeId;
     target: boolean;
 
     private config: GraphConfig;
-    private layout: Layout<Graph>;
+    private layout: Layout<Graph<NodeData, LinkData>>;
     private isDragging = false;
     private dragEnded = false;
     private _shouldTap = false;
 
-    constructor(graphNode: Node, layout: Layout<Graph>, config: GraphConfig, texture?: Texture) {
+    constructor(graphNode: Node, layout: Layout<Graph<NodeData, LinkData>>, config: GraphConfig, texture?: Texture) {
         super();
         this.config = { ...config };
         this.label = graphNode.data.label;
-        this.nodeId = graphNode.id;
+        this.id = graphNode.id;
         this.target = graphNode.data.target || false;
         this.layout = layout;
         this.graphPosition = layout.getNodePosition(graphNode.id);
@@ -41,21 +41,28 @@ export class PixiNode extends Container {
         return this._shouldTap;
     }
 
-    updatePosition(): void {
+    get links(): Set<Link> | null {
+        const node = this.layout.graph.getNode(this.id);
+        return node?.links || null;
+    }
+
+    update(): void {
         this.setTransform(this.graphPosition.x, this.graphPosition.y);
     }
 
     isPinned(): boolean {
-        const node = this.layout.graph.getNode(this.nodeId);
+        const node = this.layout.graph.getNode(this.id);
         if (node) {
             return this.layout.isNodePinned(node);
         }
         return false;
     }
 
-    pin(): void {
-        const node = this.layout.graph.getNode(this.nodeId);
-        node && this.layout.pinNode(node, true);
+    pin(pos?: Vector): void {
+        const node = this.layout.graph.getNode(this.id);
+        if (!node) return;
+        pos && this.layout.setNodePosition(this.id, pos.x, pos.y);
+        this.layout.pinNode(node, true);
     }
 
     onDragStart(e: InteractionEvent): void {
@@ -83,7 +90,7 @@ export class PixiNode extends Container {
     onDragMove(e: InteractionEvent): boolean {
         if (this.isDragging) {
             const graphPos = e.data.getLocalPosition(this.parent, undefined, e.data.global); // pixi.getGraphCoordinates(e.data.global.x, e.data.global.y);
-            this.layout.setNodePosition(this.nodeId, graphPos.x, graphPos.y);
+            this.layout.setNodePosition(this.id, graphPos.x, graphPos.y);
             return true;
         }
         return false;

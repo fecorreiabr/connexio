@@ -1,5 +1,5 @@
 import { GraphConfig } from "@/options";
-import { Graph, Layout, Link, Vector } from "@/plugins/ngraph";
+import { Graph, Layout, Link, LinkData, NodeData, Vector } from "@/plugins/ngraph";
 import { Graphics, Polygon } from "@/plugins/pixijs";
 
 interface Edge {
@@ -21,14 +21,14 @@ export class PixiLink extends Graphics {
     fromPos?: Vector;
 
     private config: Pick<GraphConfig, 'arrowColor' | 'arrowSize' | 'lineHitWidth' | 'nodeRadius' | 'selfLinkDistance' | 'selfLinkRadius'>;
-    private layout: Layout<Graph>;
+    private layout: Layout<Graph<NodeData, LinkData>>;
     private hitAreaPolygon: Polygon;
     private _selfLink: boolean;
 
     /**
      *
      */
-    constructor(graphLink: Link, layout: Layout<Graph>, config: GraphConfig) {
+    constructor(graphLink: Link, layout: Layout<Graph<NodeData, LinkData>>, config: GraphConfig) {
         super();
         this.id = graphLink.data.groupId;
         this.layout = layout;

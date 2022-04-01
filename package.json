@@ -41,8 +41,11 @@
     "@pixi/text": "^6.2.2",
     "@pixi/ticker": "^6.2.2",
     "@pixi/utils": "^6.2.2",
+    "ngraph.events": "^1.2.1",
     "ngraph.forcelayout": "^3.3.0",
-    "ngraph.graph": "^20.0.0"
+    "ngraph.fromjson": "^3.1.0",
+    "ngraph.graph": "^20.0.0",
+    "ts-md5": "^1.2.11"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.2",

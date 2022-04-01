@@ -3,7 +3,7 @@ import { NodeId } from "@/plugins/ngraph";
 export type NodeType = {
     desc: string;
     idLabel?: string;
-    img: string;
+    img?: string;
     formatId?: (id: NodeId) => string;
 };
 
@@ -23,7 +23,7 @@ export type GraphOptions = {
     targetColor: number;
 };
 
-export type GraphConfig = GraphOptions & {
+type CalculatedParams = {
     nodeRadius: number;
     arrowSize: number;
     selfLinkRadius: number;
@@ -32,6 +32,8 @@ export type GraphConfig = GraphOptions & {
     nodeIconSize: number;
     arrowColor: number;
 };
+
+export type GraphConfig = GraphOptions & CalculatedParams;
 
 export const defaultOptions: GraphOptions = {
     actionIconsColor: 0x0099ff,
