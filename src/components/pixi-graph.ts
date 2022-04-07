@@ -1,20 +1,19 @@
-import { GraphConfig } from "@/options";
-import { Graph, Layout, Link, LinkData, LinkId, Node, NodeData, NodeId } from "@/plugins/ngraph";
-import { Application, Container, Texture } from "@/plugins/pixijs";
-import { PixiLink } from "./pixi-link";
-import { PixiNode } from "./pixi-node";
+import { GraphConfig } from '@/options';
+import { Graph, Layout, Link, LinkData, LinkId, Node, NodeData, NodeId } from '@/plugins/ngraph';
+import { Application, Container, Texture } from '@/plugins/pixijs';
+import { PixiLink } from './pixi-link';
+import { PixiNode } from './pixi-node';
 
 export class PixiGraph extends Application {
-    
     config: GraphConfig;
     layout: Layout<Graph<NodeData, LinkData>>;
     textures?: Record<string, Texture>;
 
-    private nodes!: Map<NodeId, PixiNode>;
-    private links!: Map<LinkId, PixiLink>;
-    private nodesContainer!: Container;
-    private linksContainer!: Container;
-    private targets!: Set<NodeId>;
+    private nodes!: Map<NodeId, PixiNode>; // refs to the nodes drawn on the pixi app
+    private links!: Map<LinkId, PixiLink>; // refs to the links drawn on the pixi app
+    private nodesContainer!: Container; // container that holds the node graphics
+    private linksContainer!: Container; // container that holds the link graphics
+    private targets!: Set<NodeId>; // refs to the node ids that are targets
 
     animationControl?: AnimationControl;
     rendererStarted = false;
@@ -24,23 +23,18 @@ export class PixiGraph extends Application {
             width: containerElem.clientWidth,
             height: containerElem.clientHeight,
             backgroundColor: graphConfig.backgroundColor,
-            antialias: true
+            antialias: true,
         });
         containerElem.appendChild(this.view);
         this.resizeTo = containerElem;
         this.resetView();
-        this.loadTextures();
 
         this.config = graphConfig;
         this.layout = layout;
+        this.loadTextures();
 
         // Create containers
         this.createContainers();
-
-        // this.config = { // TODO: move to external component
-        //     ...graphConfig,
-        //     ...calculateParams(graphConfig),
-        // };
 
         this.initNodes();
         this.initLinks();
@@ -61,10 +55,7 @@ export class PixiGraph extends Application {
         }
 
         this.ticker.add(() => {
-            if (this.layout.step)
-                this.updateLayout();
-            // this.drawGraph();
-            // this.updateGraphics();
+            if (this.layout.step) this.updateLayout();
             this.render();
         });
         this.rendererStarted = true;
@@ -120,13 +111,12 @@ export class PixiGraph extends Application {
         // Nodes container events
         this.nodesContainer.on('childAdded', (node: PixiNode) => {
             this.nodes.set(node.id, node);
-            if (node.target)
-                this.targets.add(node.id);
+            if (node.target) this.targets.add(node.id);
         });
         this.nodesContainer.on('removedFrom', (node: PixiNode) => {
             this.nodes.delete(node.id);
             this.targets.delete(node.id);
-        })
+        });
 
         // Links container events
         this.linksContainer.on('childAdded', (link: PixiLink) => {
@@ -140,7 +130,7 @@ export class PixiGraph extends Application {
     /**
      * Creates the nodes for the initial graph
      */
-     private initNodes(): void {
+    private initNodes(): void {
         this.nodes = new Map();
         this.targets = new Set();
         this.layout.graph.forEachNode(node => {
@@ -154,10 +144,10 @@ export class PixiGraph extends Application {
      * Creates and adds a single node to the PIXI Application
      * @param graphNode node to add
      */
-     private addNode(graphNode: Node): void {
+    private addNode(graphNode: Node): void {
         const node = new PixiNode(graphNode, this.layout, this.config, this.textures?.[graphNode.data.type]);
         this.nodesContainer.addChild(node);
-        
+
         // if (node.target) { // TODO: chek if necessary
         //     this.targets.add(id);
         // }
@@ -165,7 +155,7 @@ export class PixiGraph extends Application {
 
     /**
      * Fixes the "main node" in the screen, in order to keep the graph in the center of the stage.
-     * 
+     *
      * The main node is either:
      * * the only target, if just one target node is provided
      * * the target which contains the greater amount of incoming/outgoing links
@@ -173,7 +163,7 @@ export class PixiGraph extends Application {
      */
     private pinMainNode(): void {
         if (!this.targets.size) return;
-        
+
         let mainNode: PixiNode;
         if (this.targets.size === 1) {
             const id = this.targets.values().next().value;
@@ -185,25 +175,25 @@ export class PixiGraph extends Application {
             this.targets.forEach(t => {
                 const node = this.nodes.get(t);
                 node && targetNodes.push(node);
-            })
+            });
 
             // order by links size DESC
             targetNodes.sort((n1: PixiNode, n2: PixiNode) => {
-                return (n2.links?.size || 0) - (n1.links?.size || 0)
+                return (n2.links?.size || 0) - (n1.links?.size || 0);
             });
 
             mainNode = targetNodes[0];
         }
 
         if (!mainNode.isPinned()) {
-            mainNode.pin({ x: 0, y: 0 })
+            mainNode.pin({ x: 0, y: 0 });
         }
     }
 
     /**
      * Creates the links for the initial graph
      */
-     private initLinks(): void {
+    private initLinks(): void {
         this.links = new Map();
         this.layout.graph.forEachLink(link => {
             this.addLink(link);
@@ -214,7 +204,7 @@ export class PixiGraph extends Application {
      * Creates and adds a link to the PIXI Application
      * @param graphLink link to add
      */
-     private addLink(graphLink: Link): void {
+    private addLink(graphLink: Link): void {
         let link = this.links.get(graphLink.data.groupId);
         if (link) {
             link.addGraphLink(graphLink);
@@ -226,11 +216,12 @@ export class PixiGraph extends Application {
 
     /**
      * Updates the layout calling the step function when necessary. Called only when ForceLayout is used.
-     * @returns 
+     * @returns
      */
     private updateLayout(): void {
         if (!this.animationControl) return;
-        if (this.animationControl.needsRecalc) { // TODO: update when nodes changed
+        if (this.animationControl.needsRecalc) {
+            // TODO: update when nodes changed
             this.animationControl.calculate(this.nodes.size);
         }
         // Step only increases while the amount of movement during the last operation is less than the
@@ -267,7 +258,7 @@ export class PixiGraph extends Application {
         });
         this.links.forEach(link => {
             link.update();
-        })
+        });
     }
 }
 
@@ -286,7 +277,7 @@ class AnimationControl {
     public get movesLimit(): number {
         return this._movesLimit;
     }
-    
+
     public get timeStart(): number {
         return this._timeStart;
     }

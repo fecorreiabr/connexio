@@ -1,4 +1,4 @@
-import { NodeId } from "@/plugins/ngraph";
+import { NodeId } from '@/plugins/ngraph';
 
 export type NodeType = {
     desc: string;
@@ -50,3 +50,30 @@ export const defaultOptions: GraphOptions = {
     shape: 'circle',
     targetColor: 0x9f9600,
 };
+
+export function createConfig(options?: Partial<GraphOptions>): GraphConfig {
+    const config = {
+        ...defaultOptions,
+        ...options,
+    };
+
+    const arrowSize = config.nodeSize / 3;
+    return {
+        ...config,
+        arrowColor: calculateArrowColor(config.backgroundColor),
+        arrowSize,
+        lineHitWidth: arrowSize * 0.68404028665,
+        nodeIconSize: config.nodeSize * 0.5,
+        nodeRadius: config.nodeSize / 2,
+        selfLinkRadius: config.nodeSize / 8,
+        selfLinkDistance: config.nodeSize * 2,
+    };
+}
+
+function calculateArrowColor(backgroundColor: number): number {
+    return (
+        Math.floor(((backgroundColor & 0xff0000) >> 16) * 0.7) * 0x10000 +
+        Math.floor(((backgroundColor & 0x00ff00) >> 8) * 0.7) * 0x100 +
+        Math.floor((backgroundColor & 0x0000ff) * 0.7)
+    );
+}
