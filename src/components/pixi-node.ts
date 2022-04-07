@@ -1,6 +1,6 @@
-import { Container, Graphics, InteractionEvent, Sprite, Text, Texture } from "@/plugins/pixijs";
-import { Graph, Node, NodeId, Layout, Vector, Link, NodeData, LinkData } from "@/plugins/ngraph";
-import { GraphConfig } from "@/options";
+import { Container, Graphics, InteractionEvent, Sprite, Text, Texture } from '@/plugins/pixijs';
+import { Graph, Node, NodeId, Layout, Vector, Link, NodeData, LinkData } from '@/plugins/ngraph';
+import { GraphConfig } from '@/options';
 
 export class PixiNode extends Container {
     graphPosition: Vector;
@@ -24,13 +24,22 @@ export class PixiNode extends Container {
         this.graphPosition = layout.getNodePosition(graphNode.id);
 
         // Create shape, label and icon and add them to the container
-        
+
         const shape = this.createShape();
         this.addChild(shape);
 
         const label = this.createLabel();
-        label && this.addChild(label);
-        
+        if (label) {
+            label.x = -label.width / 2;
+            if (texture) {
+                label.y = -label.height / 3 / 4;
+            } else {
+                label.y = -label.height / 2;
+            }
+
+            this.addChild(label);
+        }
+
         if (texture) {
             const icon = this.createIcon(texture);
             this.addChild(icon);
@@ -100,7 +109,7 @@ export class PixiNode extends Container {
 
     /**
      * Creates a basic shape to represent a node.
-     * 
+     *
      * Supported shapes are circle, square and roundSquare.
      * @returns a {@link Graphics} object that represents a node to be rendered
      */
@@ -111,15 +120,15 @@ export class PixiNode extends Container {
         // if node is a target, color should be different
         shape.beginFill(this.target ? this.config.targetColor : this.config.nodeColor);
         switch (this.config.shape) {
-            case "circle":
+            case 'circle':
                 shape.drawCircle(0, 0, halfNode);
                 break;
 
-            case "square":
+            case 'square':
                 shape.drawRect(-halfNode, -halfNode, this.config.nodeSize, this.config.nodeSize);
                 break;
 
-            case "roundSquare":
+            case 'roundSquare':
                 shape.drawRoundedRect(-halfNode, -halfNode, this.config.nodeSize, this.config.nodeSize, this.config.nodeSize * 0.1);
                 break;
 
@@ -148,13 +157,13 @@ export class PixiNode extends Container {
             fontFamily: this.config.fontFamily,
             fontSize: this.config.fontSize,
             fill: this.config.fontColor,
-            align: "center",
+            align: 'center',
             dropShadow: true,
             dropShadowDistance: 2,
             strokeThickness: 1,
             stroke: this.target ? this.config.targetColor : this.config.fontStrokeColor,
         });
-        
+
         // Increase default text resolution
         nodeText.resolution = 2;
 
@@ -171,7 +180,7 @@ export class PixiNode extends Container {
         icon.width = this.config.nodeIconSize;
         icon.height = this.config.nodeIconSize;
         icon.anchor.set(0.5);
-        
+
         // change icon position if there is a label
         if (this.children.find(c => c instanceof Text)) {
             icon.y = -this.config.nodeSize / 4.5;

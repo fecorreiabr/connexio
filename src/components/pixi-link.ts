@@ -1,13 +1,13 @@
-import { GraphConfig } from "@/options";
-import { Graph, Layout, Link, LinkData, NodeData, Vector } from "@/plugins/ngraph";
-import { Graphics, Polygon } from "@/plugins/pixijs";
+import { GraphConfig } from '@/options';
+import { Graph, Layout, Link, LinkData, NodeData, Vector } from '@/plugins/ngraph';
+import { Graphics, Polygon } from '@/plugins/pixijs';
 
 interface Edge {
     position: {
         from: Vector;
         to: Vector;
     };
-    arrow? : {
+    arrow?: {
         start: Vector;
         nodes: Vector[];
     };
@@ -15,7 +15,6 @@ interface Edge {
 
 export class PixiLink extends Graphics {
     id: string;
-    // histArea: Polygon;
     sourceLinks: string[];
     edges: Record<string, Edge>;
     fromPos?: Vector;
@@ -32,10 +31,19 @@ export class PixiLink extends Graphics {
         super();
         this.id = graphLink.data.groupId;
         this.layout = layout;
-        this.config = (({ arrowColor, arrowSize, lineHitWidth, nodeRadius, selfLinkDistance, selfLinkRadius }) => ({ arrowColor, arrowSize, lineHitWidth, nodeRadius, selfLinkDistance, selfLinkRadius }))(config);
+        this.config = (({ arrowColor, arrowSize, lineHitWidth, nodeRadius, selfLinkDistance, selfLinkRadius }) => ({
+            arrowColor,
+            arrowSize,
+            lineHitWidth,
+            nodeRadius,
+            selfLinkDistance,
+            selfLinkRadius,
+        }))(config);
         this._selfLink = graphLink.fromId === graphLink.toId;
-        this.sourceLinks = [];
-        this.edges = {};
+        this.sourceLinks = [graphLink.data.uuid];
+        this.edges = {
+            [graphLink.id]: { position: layout.getLinkPosition(graphLink.id) },
+        };
         this.interactive = true;
         this.buttonMode = true;
         this.hitAreaPolygon = new Polygon();
@@ -50,8 +58,8 @@ export class PixiLink extends Graphics {
         if (graphLink.data.groupId !== this.id) throw new Error('Link must be added to the same group');
         this.sourceLinks.push(graphLink.data.uuid);
         this.edges[graphLink.id] = {
-            position: this.layout.getLinkPosition(graphLink.id)
-        }
+            position: this.layout.getLinkPosition(graphLink.id),
+        };
     }
 
     /**
@@ -64,8 +72,7 @@ export class PixiLink extends Graphics {
         if (link >= 0) {
             this.sourceLinks.splice(link, 1);
             // if there are no more links with the same id (same from-to), remove the edge
-            if (!this.sourceLinks.includes(graphLink.id))
-                delete this.edges[graphLink.id];
+            if (!this.sourceLinks.includes(graphLink.id)) delete this.edges[graphLink.id];
 
             if (!Object.keys(this.edges).length) {
                 //no more edges, destroy graphic
@@ -88,7 +95,7 @@ export class PixiLink extends Graphics {
         let hitAreaCalculated = false;
         for (const k in this.edges) {
             const edge = this.edges[k];
-            
+
             // get source coords
             let from: Vector = {
                 x: edge.position.from.x,
@@ -107,7 +114,7 @@ export class PixiLink extends Graphics {
             }
 
             // calculate end coords
-            // TODO: calculate based on node shape?
+            // TODO: calculate based on node shape
             const angle = Math.atan2(edge.position.to.y - from.y, edge.position.to.x - from.x);
             const end: Vector = {
                 x: -Math.cos(angle) * this.config.nodeRadius + edge.position.to.x,
