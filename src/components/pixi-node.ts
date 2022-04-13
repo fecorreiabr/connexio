@@ -11,7 +11,7 @@ export class PixiNode extends Container {
     private config: GraphConfig;
     private layout: Layout<Graph<NodeData, LinkData>>;
     private isDragging = false;
-    private dragEnded = false;
+    private pressed = false;
     private _shouldTap = false;
 
     constructor(graphNode: Node, layout: Layout<Graph<NodeData, LinkData>>, config: GraphConfig, texture?: Texture) {
@@ -44,6 +44,14 @@ export class PixiNode extends Container {
             const icon = this.createIcon(texture);
             this.addChild(icon);
         }
+
+        this.interactive = true;
+        this.buttonMode = true;
+
+        this.on('pointerdown', this.onPointerDown);
+        this.on('pointermove', this.onPointerMove);
+        this.on('pointerup', this.onPointerUp);
+        this.on('pointerupoutside', this.onPointerUp);
     }
 
     get shouldTap(): boolean {
@@ -74,21 +82,14 @@ export class PixiNode extends Container {
         this.layout.pinNode(node, true);
     }
 
-    onDragStart(e: InteractionEvent): void {
+    onPointerDown(e: InteractionEvent): void {
         if (e.data.button == 0) {
-            this.dragEnded = false;
-            setTimeout(() => {
-                if (!this.dragEnded) {
-                    this.pin();
-                    this.isDragging = true;
-                    this._shouldTap = false;
-                }
-            }, 200);
+            this.pressed = true;
         }
     }
 
-    onDragEnd(_: InteractionEvent): void {
-        this.dragEnded = true;
+    onPointerUp(_: InteractionEvent): void {
+        this.pressed = false;
         if (!this.isDragging) {
             this._shouldTap = true;
         } else {
@@ -96,13 +97,17 @@ export class PixiNode extends Container {
         }
     }
 
-    onDragMove(e: InteractionEvent): boolean {
-        if (this.isDragging) {
-            const graphPos = e.data.getLocalPosition(this.parent, undefined, e.data.global); // pixi.getGraphCoordinates(e.data.global.x, e.data.global.y);
+    onPointerMove(e: InteractionEvent): void {
+        if (e.data.buttons === 1 && this.pressed) {
+            if (!this.isDragging) {
+                this.isDragging = true;
+                this.pin();
+                this._shouldTap = false;
+            }
+            const graphPos = e.data.getLocalPosition(this.parent, undefined, e.data.global);
             this.layout.setNodePosition(this.id, graphPos.x, graphPos.y);
-            return true;
+            this.layout.fire('drag');
         }
-        return false;
     }
 
     // Node creation methods

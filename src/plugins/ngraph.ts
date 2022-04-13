@@ -22,7 +22,7 @@ type LinkData = {
 };
 
 type Graph<T extends NodeData, U extends LinkData> = NGraph<T, U> & EventedType;
-type Layout<T extends Graph<any, any>> = ForceLayout<T> | FixedLayout<T>;
+type Layout<T extends Graph<any, any>> = (ForceLayout<T> | FixedLayout<T>) & EventedType;
 type Node = NNode<NodeData>;
 type Link = NLink<LinkData>;
 

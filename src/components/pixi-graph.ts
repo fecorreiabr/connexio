@@ -39,6 +39,8 @@ export class PixiGraph extends Application {
         this.initNodes();
         this.initLinks();
 
+        this.layout.on('drag', () => this.animationControl?.reset());
+
         // TODO: add node listeners
     }
 

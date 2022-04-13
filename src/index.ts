@@ -1,4 +1,6 @@
 import createGraph from './connexio';
+import { Graph } from 'ngraph.graph';
+import { EventedType } from 'ngraph.events';
 
 export default createGraph;
 
@@ -28,4 +30,8 @@ declare global {
         // onmousewheel was removed in recent typescript, but it is necesssary for retro-compatibility
         onmousewheel: ((this: Window, ev: Event) => any) | null;
     }
+}
+
+declare module 'ngraph.forcelayout' {
+    export default function createLayout<T extends Graph>(graph: T, physicsSettings?: Partial<PhysicsSettings>): Layout<T> & EventedType;
 }
