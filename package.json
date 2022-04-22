@@ -1,6 +1,6 @@
 {
   "name": "connexio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Browser-based library for rendering and interacting with graphs",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -15,6 +15,10 @@
     "build": "rimraf ./dist && rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fecorreiabr/connexio.git"
+  },
   "keywords": [
     "canvas",
     "edge",
@@ -27,6 +31,9 @@
   ],
   "author": "Felipe dos Reis Correia",
   "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/fecorreiabr/connexio/issues"
+  },
   "dependencies": {
     "@pixi/app": "^6.2.2",
     "@pixi/constants": "^6.2.2",
