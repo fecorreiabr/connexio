@@ -56,10 +56,14 @@ export class PixiGraph extends Application {
             this.animationControl = new AnimationControl(this.nodes.size);
         }
 
-        this.ticker.add(() => {
-            if (this.layout.step) this.updateLayout();
-            this.render();
-        });
+        if (this.layout.step) {
+            this.ticker.add(() => {
+                this.updateLayout();
+                this.render();
+            });
+        } else {
+            this.ticker.add(() => this.render());
+        }
         this.rendererStarted = true;
     }
 
