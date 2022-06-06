@@ -39,8 +39,6 @@ export class PixiGraph extends Application {
         this.initNodes();
         this.initLinks();
 
-        this.layout.on('drag', () => this.animationControl?.reset());
-
         // TODO: add node listeners
     }
 
@@ -54,15 +52,14 @@ export class PixiGraph extends Application {
 
         if (this.layout.step) {
             this.animationControl = new AnimationControl(this.nodes.size);
-        }
-
-        if (this.layout.step) {
             this.ticker.add(() => {
                 this.updateLayout();
                 this.render();
             });
+            this.layout.on('drag', () => this.animationControl!.reset());
         } else {
             this.ticker.add(() => this.render());
+            this.layout.on('drag', () => this.updateGraphics());
         }
         this.rendererStarted = true;
     }

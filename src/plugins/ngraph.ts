@@ -1,12 +1,11 @@
 import { Graph as NGraph, Link as NLink, LinkId, Node as NNode, NodeId } from 'ngraph.graph';
 import createLayout, { Layout as ForceLayout, PhysicsSettings, Vector } from 'ngraph.forcelayout';
-import { EventedType } from 'ngraph.events';
+import eventify, { EventedType } from 'ngraph.events';
 import fromJson, { JsonGraph, JsonLink, JsonNode } from 'ngraph.fromjson';
 
 interface FixedLayout<T extends Graph<any, any>>
-    extends Pick<ForceLayout<T>, 'getNodePosition' | 'setNodePosition' | 'getLinkPosition' | 'graph' | 'pinNode' | 'isNodePinned'> {
+    extends Pick<ForceLayout<T>, 'getNodePosition' | 'setNodePosition' | 'getLinkPosition' | 'graph' | 'pinNode' | 'isNodePinned' | 'lastMove'> {
     step: undefined;
-    lastMove: 0;
 }
 
 type NodeData = {
@@ -26,9 +25,17 @@ type Layout<T extends Graph<any, any>> = (ForceLayout<T> | FixedLayout<T>) & Eve
 type Node = NNode<NodeData>;
 type Link = NLink<LinkData>;
 
+type GraphChange = {
+    changeType: 'add' | 'remove';
+    node?: Node;
+    link?: Link;
+}
+
 export {
     EventedType,
+    FixedLayout,
     Graph,
+    GraphChange,
     Link,
     LinkId,
     LinkData,
@@ -43,4 +50,5 @@ export {
     JsonNode,
     fromJson,
     createLayout,
+    eventify
 };
