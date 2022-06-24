@@ -24,6 +24,12 @@ type Graph<T extends NodeData, U extends LinkData> = NGraph<T, U> & EventedType;
 type Layout<T extends Graph<any, any>> = (ForceLayout<T> | FixedLayout<T>) & EventedType;
 type Node = NNode<NodeData>;
 type Link = NLink<LinkData>;
+type NodeEventDetail<T extends NodeData = NodeData> = {
+    id: NodeId;
+    data: T;
+    x: number;
+    y: number;
+};
 
 type GraphChange = {
     changeType: 'add' | 'remove';
@@ -42,6 +48,8 @@ export {
     Node,
     NodeId,
     NodeData,
+    NodeEventDetail,
+    // NodeListener,
     Layout,
     PhysicsSettings,
     Vector,

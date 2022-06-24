@@ -1,10 +1,13 @@
 import createGraph from './connexio';
 import { Graph } from 'ngraph.graph';
 import { EventedType } from 'ngraph.events';
+import { NodeEventDetail } from './plugins/ngraph';
 
 export default createGraph;
 
 interface CustomEventMap {
+    nodetap: CustomEvent<NodeEventDetail>;
+    noderighttap: CustomEvent<NodeEventDetail>;
     mousewheel: CustomEvent<number>;
     DOMMouseScroll: CustomEvent<number>;
     MozMousePixelScroll: CustomEvent<number>;
@@ -17,14 +20,7 @@ declare global {
         // detail?: number;
     }
 
-    interface Element {
-        //adds definition to Document, but you can do the same with HTMLElement
-        addEventListener<K extends keyof CustomEventMap>(
-            type: K,
-            listener: (this: Document, ev: CustomEventMap[K]) => unknown,
-            options?: boolean | AddEventListenerOptions
-        ): void;
-    }
+    interface ElementEventMap extends CustomEventMap {}
 
     interface Window {
         // onmousewheel was removed in recent typescript, but it is necesssary for retro-compatibility
