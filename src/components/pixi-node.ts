@@ -88,10 +88,16 @@ export class PixiNode extends Container {
         }
     }
 
-    onPointerUp(_: InteractionEvent): void {
+    onPointerUp(e: InteractionEvent): void {
         this.pressed = false;
         if (!this.isDragging) {
             this._shouldTap = true;
+            const event = {
+                0: 'nodetap',
+                2: 'noderighttap',
+            }[e.data.button];
+
+            if (event) this.parent.emit(event, this, e);
         } else {
             this.isDragging = false;
         }

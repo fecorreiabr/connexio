@@ -13,6 +13,7 @@ import {
     NodeData,
     PhysicsSettings,
 } from './plugins/ngraph';
+import createFixedLayout from './layout/fixed-layout';
 import { hash } from './util/hash';
 
 type JsonData<X, Y> = JsonGraph<JsonNode<NodeData> | X, JsonLink<LinkData> | Y> | string;
@@ -42,11 +43,14 @@ export default function createGraph(containerElem: HTMLElement, options?: Partia
             graph = _graph;
         }
 
-        // Force Layout
-        physicsSettings = createPhysicsSettings(config.nodeSize);
-        layout = createLayout(graph, physicsSettings);
-
-        // TODO: fixed layout
+        if (config.layout === 'force') {
+            // Force Layout
+            physicsSettings = createPhysicsSettings(config.nodeSize);
+            layout = createLayout(graph, physicsSettings);
+        } else if (config.layout === 'fixed') {
+            // Fixed Layout
+            layout = createFixedLayout(graph);
+        }
 
         pixiGraph = new PixiGraph(containerElem, config, layout);
         pixiGraph.startRenderer();

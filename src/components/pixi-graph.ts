@@ -1,6 +1,6 @@
 import { GraphConfig } from '@/options';
 import { Graph, Layout, Link, LinkData, LinkId, Node, NodeData, NodeId } from '@/plugins/ngraph';
-import { Application, Container, Texture } from '@/plugins/pixijs';
+import { Application, Container, InteractionEvent, Texture } from '@/plugins/pixijs';
 import { PixiLink } from './pixi-link';
 import { PixiNode } from './pixi-node';
 
@@ -39,9 +39,9 @@ export class PixiGraph extends Application {
         this.initNodes();
         this.initLinks();
 
-        this.layout.on('drag', () => this.animationControl?.reset());
-
-        // TODO: add node listeners
+        // node listeners
+        this.nodesContainer.on('nodetap', (node: PixiNode, e: InteractionEvent) => this.dispatchNodeEvent('nodetap', node, e));
+        this.nodesContainer.on('noderighttap', (node: PixiNode, e: InteractionEvent) => this.dispatchNodeEvent('noderighttap', node, e));
     }
 
     /**
@@ -54,12 +54,15 @@ export class PixiGraph extends Application {
 
         if (this.layout.step) {
             this.animationControl = new AnimationControl(this.nodes.size);
+            this.ticker.add(() => {
+                this.updateLayout();
+                this.render();
+            });
+            this.layout.on('drag', () => this.animationControl!.reset());
+        } else {
+            this.ticker.add(() => this.render());
+            this.layout.on('drag', () => this.updateGraphics());
         }
-
-        this.ticker.add(() => {
-            if (this.layout.step) this.updateLayout();
-            this.render();
-        });
         this.rendererStarted = true;
     }
 
@@ -261,6 +264,27 @@ export class PixiGraph extends Application {
         this.links.forEach(link => {
             link.update();
         });
+    }
+
+    private dispatchEvent<K extends keyof ElementEventMap>(type: K, args: CustomEventInit<ElementEventMap[K] extends CustomEvent<infer X> ? X : never>): void {
+        const event = new CustomEvent(type, args);
+        this.resizeTo.dispatchEvent(event);
+    }
+
+    private dispatchNodeEvent(type: 'nodetap' | 'noderighttap', node: PixiNode, e: InteractionEvent): void {
+        const graphNode = this.layout.graph.getNode(node.id);
+        if (!graphNode) return;
+        const evt = e.data.originalEvent as MouseEvent;
+        evt.preventDefault();
+        this.dispatchEvent(type, {
+            bubbles: true,
+            detail: {
+                id: node.id,
+                data: graphNode.data,
+                x: evt.clientX,
+                y: evt.clientY
+            }
+        })
     }
 }
 

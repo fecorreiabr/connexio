@@ -15,6 +15,7 @@ export type GraphOptions = {
     fontSize: number;
     fontStrokeColor: number;
     labelTransform: ((label: string) => string) | null;
+    layout: 'force' | 'fixed';
     nodeColor: number;
     nodeIconColor: number | null;
     nodeSize: number;
@@ -43,6 +44,7 @@ export const defaultOptions: GraphOptions = {
     fontSize: 12,
     fontStrokeColor: 0x0099ff,
     labelTransform: null,
+    layout: 'force',
     nodeColor: 0x0099ff,
     nodeIconColor: null,
     nodeSize: 40,
