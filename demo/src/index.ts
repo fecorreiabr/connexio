@@ -1,4 +1,4 @@
-import createGraph from 'connexio';
+import { createGraph } from 'connexio';
 import { sample, sampleFixed } from './sample';
 
 const mode: 'force' | 'fixed' = 'force';

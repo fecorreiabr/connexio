@@ -39,8 +39,8 @@ export default [
     {
         input: 'src/index.ts',
         output: [
-            { file: pkg.main, format: 'cjs', sourcemap: true },
-            { file: pkg.module, format: 'es', sourcemap: true },
+            { file: pkg.main, format: 'cjs', sourcemap: true, exports: 'named' },
+            { file: pkg.module, format: 'es', sourcemap: true, exports: 'named' },
         ],
         plugins: [peerDepsExternal(), resolve({ browser: true, preferBuiltins: false }), commonjs(), ts({ tsconfig: './tsconfig.json' })],
     },

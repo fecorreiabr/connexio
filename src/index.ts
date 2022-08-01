@@ -3,7 +3,7 @@ import { Graph } from 'ngraph.graph';
 import { EventedType } from 'ngraph.events';
 import { NodeEventDetail } from './plugins/ngraph';
 
-export default createGraph;
+export { createGraph };
 
 interface CustomEventMap {
     nodetap: CustomEvent<NodeEventDetail>;
