@@ -1,5 +1,5 @@
 import { GraphConfig } from '@/options';
-import { Graph, Layout, Link, LinkData, LinkId, Node, NodeData, NodeId } from '@/plugins/ngraph';
+import { Graph, GraphChange, Layout, Link, LinkData, LinkId, Node, NodeData, NodeId } from '@/plugins/ngraph';
 import { Application, Container, InteractionEvent, Texture } from '@/plugins/pixijs';
 import { PixiLink } from './pixi-link';
 import { PixiNode } from './pixi-node';
@@ -42,6 +42,8 @@ export class PixiGraph extends Application {
         // node listeners
         this.nodesContainer.on('nodetap', (node: PixiNode, e: InteractionEvent) => this.dispatchNodeEvent('nodetap', node, e));
         this.nodesContainer.on('noderighttap', (node: PixiNode, e: InteractionEvent) => this.dispatchNodeEvent('noderighttap', node, e));
+
+        this.registerGraphChangeEvents();
     }
 
     /**
@@ -225,10 +227,6 @@ export class PixiGraph extends Application {
      */
     private updateLayout(): void {
         if (!this.animationControl) return;
-        if (this.animationControl.needsRecalc) {
-            // TODO: update when nodes changed
-            this.animationControl.calculate(this.nodes.size);
-        }
         // Step only increases while the amount of movement during the last operation is less than the
         // limit calculated by AnimationControl, otherwise it is set to zero.
         if (this.layout.lastMove < this.animationControl.movesLimit) {
@@ -286,9 +284,36 @@ export class PixiGraph extends Application {
             }
         })
     }
+
+    private registerGraphChangeEvents(): void {
+        this.layout.graph.on('changed', (changes: GraphChange[]) => {
+            changes.forEach(change => {
+                switch (change.changeType) {
+                    case 'add':
+                        change.node && this.addNode(change.node);
+                        change.link && this.addLink(change.link);
+                        this.pinMainNode();
+                        // this.stepCounter = 0;
+                        break;
+
+                    case 'remove':
+                        // TODO:
+
+                        break;
+
+                    default:
+                        break;
+                }
+            });
+            if (this.animationControl) {
+                this.animationControl.update(this.nodes.size);
+            }
+        });
+    }
 }
 
 class AnimationControl {
+    private _nodeCount: number;
     private _movesLimit!: number;
     private _timeStart!: number;
     private _timeLimit!: number;
@@ -297,7 +322,8 @@ class AnimationControl {
     private _stepCounter = 0;
 
     constructor(nodeCount: number) {
-        this.calculate(nodeCount);
+        this._nodeCount = nodeCount;
+        this.calculate();
     }
 
     public get movesLimit(): number {
@@ -332,8 +358,8 @@ class AnimationControl {
         return this.stepCounter >= this.stepCountLimit;
     }
 
-    calculate(nodeCount: number): void {
-        this._movesLimit = Math.round(Math.pow(nodeCount, 2) * 0.04);
+    calculate(): void {
+        this._movesLimit = Math.round(Math.pow(this._nodeCount, 2) * 0.04);
         this._timeStart = Date.now();
         this._timeLimit = this._timeStart + 20000;
         this._needsRecalc = false;
@@ -345,5 +371,11 @@ class AnimationControl {
 
     reset(): void {
         this._stepCounter = 0;
+    }
+
+    update(nodeCount: number): void {
+        this._nodeCount = nodeCount;
+        this.calculate();
+        this.reset();
     }
 }

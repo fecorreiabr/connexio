@@ -27,6 +27,18 @@ export const sample: Sample = {
     ],
     targets: [3],
 };
+export const addSample = {
+    nodes: [
+        { id: 6, label: 'Ariana Smith', type: 'Person' },
+        { id: 7, label: 'Colin Lister', type: 'Person' },
+    ],
+    links: [
+        { source: 'Amanda Wright', sourceId: 4, target: 'Ariana Smith', targetId: 6, label: 'sister' },
+        { source: 'Ariana Smith', sourceId: 6, target: 'Amanda Wright', targetId: 4, label: 'sister' },
+        { source: 'Colin Lister', sourceId: 7, target: 'Ariana Smith', targetId: 6, label: 'boyfriend' },
+        { source: 'Ariana Smith', sourceId: 6, target: 'Colin Lister', targetId: 7, label: 'girlfriend' },
+    ]
+};
 
 export const sampleFixed: Sample = {
     nodes: [

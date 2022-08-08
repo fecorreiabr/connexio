@@ -57,20 +57,21 @@ export default function createGraph(containerElem: HTMLElement, options?: Partia
         globalInput(pixiGraph);
     }
 
-    function addData<X, Y>(jsonData: JsonData<X, Y>): void {
+    function addData<X, Y>(jsonData: JsonData<X, Y>, transformers?: JsonTransformers<NodeData, LinkData, X, Y>): void {
         if (!graph) {
-            initGraph(jsonData);
+            initGraph(jsonData, transformers);
             return;
         }
 
         // generate nodes and links
-        const _graph = graphFromJson(jsonData);
+        const _graph = graphFromJson(jsonData, transformers);
         if (!_graph) throw 'Error when adding data';
 
         // add nodes and links to graph in a 'bulk' update
         graph.beginUpdate();
         _graph.forEachNode(node => {
-            graph.addNode(node.id, node.data);
+            if (!graph.getNode(node.id)) // only add node if it is not already in the graph
+                graph.addNode(node.id, node.data);
         });
         _graph.forEachLink(link => {
             graph.addLink(link.fromId, link.toId, link.data);
