@@ -16,7 +16,10 @@ document.body.style.margin = '0';
 
 document.body.addEventListener('nodetap', e => {
     const elem = document.getElementById('label')!;
-    elem.innerText = e.detail.data.label || '';
+    (elem.children[0] as HTMLElement).innerText = e.detail.data.label || '';
+    // elem.innerText = e.detail.data.label || '';
+    (elem.children[1] as HTMLElement).dataset.nodeid = `${e.detail.id}`;
+    (elem.children[1] as HTMLElement).innerText = 'X';
     elem.style.left = e.detail.x + 10 + 'px';
     elem.style.top = e.detail.y + 10 + 'px';
 });
@@ -62,6 +65,12 @@ btnAdd!.addEventListener('click', _ => {
         nodeTransformer,
         linkTransformer,
     });
+});
+
+const btnRemove = document.getElementById('btnRemove');
+btnRemove!.addEventListener('click', _ => {
+    const nodeId = parseInt(btnRemove?.dataset.nodeid || '');
+    graph.removeNode(nodeId);
 });
 
 graph.initGraph(data[mode], {
