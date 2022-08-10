@@ -75,10 +75,8 @@ export class PixiLink extends Graphics {
             if (!this.sourceLinks.includes(graphLink.id)) delete this.edges[graphLink.id];
 
             if (!Object.keys(this.edges).length) {
-                //no more edges, destroy graphic
+                //no more edges, remove from parent (where the removal will be handled)
                 this.parent.removeChild(this);
-                this.destroy({ children: true });
-                // this.links.delete(graphLink.data.groupId); // TODO: remove from control list
                 return true;
             }
         }

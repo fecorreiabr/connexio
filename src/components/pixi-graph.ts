@@ -43,6 +43,12 @@ export class PixiGraph extends Application {
         this.nodesContainer.on('nodetap', (node: PixiNode, e: InteractionEvent) => this.dispatchNodeEvent('nodetap', node, e));
         this.nodesContainer.on('noderighttap', (node: PixiNode, e: InteractionEvent) => this.dispatchNodeEvent('noderighttap', node, e));
 
+        // link listeners
+        this.linksContainer.on('childRemoved', (link: PixiLink) => {
+            this.links.delete(link.id);
+            link.destroy({ children: true });
+        });
+
         this.registerGraphChangeEvents();
     }
 
@@ -158,6 +164,27 @@ export class PixiGraph extends Application {
         // if (node.target) { // TODO: chek if necessary
         //     this.targets.add(id);
         // }
+    }
+
+    /**
+     * Remove a node from the graph based on its id
+     * @param nodeId  node to remove
+     */
+    private removeNode(graphNode: Node): void {
+        const node = this.nodes.get(graphNode.id)
+        if (node) {
+            this.nodes.delete(node.id);
+            this.nodesContainer.removeChild(node);
+            node.destroy({ children: true });
+            // TODO: emit node removed?
+        }
+    }
+
+    private removeLink(graphLink: Link): void {
+        const link = this.links.get(graphLink.data.groupId);
+        if (link) {
+            link.removeGraphLink(graphLink);
+        }
     }
 
     /**
@@ -297,7 +324,8 @@ export class PixiGraph extends Application {
                         break;
 
                     case 'remove':
-                        // TODO:
+                        change.node && this.removeNode(change.node);
+                        change.link && this.removeLink(change.link);
 
                         break;
 

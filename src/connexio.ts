@@ -11,6 +11,7 @@ import {
     Layout,
     LinkData,
     NodeData,
+    NodeId,
     PhysicsSettings,
 } from './plugins/ngraph';
 import createFixedLayout from './layout/fixed-layout';
@@ -33,6 +34,7 @@ export default function createGraph(containerElem: HTMLElement, options?: Partia
     const api = {
         initGraph,
         addData,
+        removeNode
     };
 
     return api;
@@ -77,6 +79,14 @@ export default function createGraph(containerElem: HTMLElement, options?: Partia
             graph.addLink(link.fromId, link.toId, link.data);
         });
         graph.endUpdate();
+    }
+
+    function removeNode(nodeId: NodeId): void {
+        if (!graph) {
+            throw 'Graph not initialized';
+        }
+
+        graph.removeNode(nodeId);
     }
 
     function graphFromJson<X, Y>(
