@@ -14,19 +14,25 @@ const graph = createGraph(document.body, {
 document.body.style.height = '100vh';
 document.body.style.margin = '0';
 
+const labelElem = document.getElementById('label')!;
 document.body.addEventListener('nodetap', e => {
-    const elem = document.getElementById('label')!;
-    (elem.children[0] as HTMLElement).innerText = e.detail.data.label || '';
+    labelElem.style.visibility = 'visible';
+    (labelElem.children[0] as HTMLElement).innerText = e.detail.data.label || '';
     // elem.innerText = e.detail.data.label || '';
-    (elem.children[1] as HTMLElement).dataset.nodeid = `${e.detail.id}`;
-    (elem.children[1] as HTMLElement).innerText = 'X';
-    elem.style.left = e.detail.x + 10 + 'px';
-    elem.style.top = e.detail.y + 10 + 'px';
+    (labelElem.children[1] as HTMLElement).dataset.nodeid = `${e.detail.id}`;
+    (labelElem.children[1] as HTMLElement).innerText = 'X';
+    labelElem.style.left = e.detail.x + 10 + 'px';
+    labelElem.style.top = e.detail.y + 10 + 'px';
 });
 document.oncontextmenu = () => (false);
 document.body.addEventListener('noderighttap', e => {
     console.log(e.detail);
 });
+for (const evt of ['bgtap', 'graphdrag', 'graphzoom']) {
+    document.body.addEventListener(evt, _ => {
+        labelElem.style.visibility = 'hidden';
+    });
+}
 
 const nodeTransformer = (node: typeof sample.nodes[0]) => {
     let data: any = {};

@@ -291,7 +291,7 @@ export class PixiGraph extends Application {
         });
     }
 
-    private dispatchEvent<K extends keyof ElementEventMap>(type: K, args: CustomEventInit<ElementEventMap[K] extends CustomEvent<infer X> ? X : never>): void {
+    dispatchEvent<K extends keyof ElementEventMap>(type: K, args: CustomEventInit<ElementEventMap[K] extends CustomEvent<infer X> ? X : never>): void {
         const event = new CustomEvent(type, args);
         this.resizeTo.dispatchEvent(event);
     }

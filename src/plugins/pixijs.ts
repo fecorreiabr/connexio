@@ -37,4 +37,10 @@ declare module '@pixi/app' {
     }
 }
 
-export { Application, Container, Graphics, InteractionEvent, Text, Texture, Polygon, Sprite };
+type StageEventDetail = {
+    x: number;
+    y: number;
+    scale: number;
+};
+
+export { Application, Container, Graphics, InteractionEvent, Text, Texture, Polygon, Sprite, StageEventDetail };
