@@ -24,7 +24,7 @@ export default [
         ],
         plugins: [
             peerDepsExternal(),
-            resolve({ browser: true, preferBuiltins: false }),
+            resolve({ browser: true, preferBuiltins: false, dedupe: ['ngraph.graph'] }),
             commonjs(),
             ts({
                 hook: {
@@ -42,6 +42,6 @@ export default [
             { file: pkg.main, format: 'cjs', sourcemap: true, exports: 'named' },
             { file: pkg.module, format: 'es', sourcemap: true, exports: 'named' },
         ],
-        plugins: [peerDepsExternal(), resolve({ browser: true, preferBuiltins: false }), commonjs(), ts({ tsconfig: './tsconfig.json' })],
+        plugins: [peerDepsExternal(), resolve({ browser: true, preferBuiltins: false, dedupe: ['ngraph.graph'] }), commonjs(), ts({ tsconfig: './tsconfig.json' })],
     },
 ];
